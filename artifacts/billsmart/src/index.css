@@ -1,0 +1,179 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-border: var(--primary-border);
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-border: var(--secondary-border);
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-border: var(--muted-border);
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-border: var(--accent-border);
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-border: var(--destructive-border);
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  /* ── BillSmart PK — Green/Teal professional theme ── */
+  --background: 0 0% 98%;
+  --foreground: 220 20% 12%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 220 20% 12%;
+  --card-border: 220 13% 91%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 20% 12%;
+  --popover-border: 220 13% 91%;
+
+  /* Emerald/Pakistan-green primary */
+  --primary: 152 60% 35%;
+  --primary-foreground: 0 0% 100%;
+  --primary-border: hsl(152 60% 29%);
+
+  --secondary: 152 20% 93%;
+  --secondary-foreground: 152 40% 20%;
+  --secondary-border: hsl(152 20% 85%);
+
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 10% 46%;
+  --muted-border: hsl(220 13% 88%);
+
+  --accent: 152 25% 90%;
+  --accent-foreground: 152 50% 22%;
+  --accent-border: hsl(152 25% 82%);
+
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --destructive-border: hsl(0 72% 40%);
+
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --ring: 152 60% 35%;
+
+  --chart-1: 152 60% 35%;
+  --chart-2: 200 70% 45%;
+  --chart-3: 45 90% 50%;
+  --chart-4: 0 70% 55%;
+  --chart-5: 270 60% 55%;
+
+  --sidebar: 152 30% 97%;
+  --sidebar-foreground: 220 20% 12%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-accent: 152 25% 92%;
+  --sidebar-accent-foreground: 152 50% 22%;
+  --sidebar-ring: 152 60% 35%;
+  --sidebar-primary: 152 60% 35%;
+  --sidebar-primary-foreground: 0 0% 100%;
+}
+
+.dark {
+  --background: 220 25% 8%;
+  --foreground: 220 15% 95%;
+
+  --card: 220 25% 11%;
+  --card-foreground: 220 15% 95%;
+  --card-border: 220 20% 20%;
+
+  --popover: 220 25% 11%;
+  --popover-foreground: 220 15% 95%;
+  --popover-border: 220 20% 20%;
+
+  --primary: 152 55% 42%;
+  --primary-foreground: 0 0% 100%;
+  --primary-border: hsl(152 55% 35%);
+
+  --secondary: 152 20% 18%;
+  --secondary-foreground: 152 30% 80%;
+  --secondary-border: hsl(152 20% 25%);
+
+  --muted: 220 20% 15%;
+  --muted-foreground: 220 10% 60%;
+  --muted-border: hsl(220 20% 22%);
+
+  --accent: 152 20% 18%;
+  --accent-foreground: 152 30% 80%;
+  --accent-border: hsl(152 20% 25%);
+
+  --destructive: 0 65% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --destructive-border: hsl(0 65% 38%);
+
+  --border: 220 20% 20%;
+  --input: 220 20% 20%;
+  --ring: 152 55% 42%;
+
+  --chart-1: 152 55% 45%;
+  --chart-2: 200 65% 55%;
+  --chart-3: 45 85% 55%;
+  --chart-4: 0 65% 60%;
+  --chart-5: 270 55% 60%;
+
+  --sidebar: 220 25% 9%;
+  --sidebar-foreground: 220 15% 95%;
+  --sidebar-border: 220 20% 18%;
+  --sidebar-accent: 152 20% 16%;
+  --sidebar-accent-foreground: 152 30% 80%;
+  --sidebar-ring: 152 55% 42%;
+  --sidebar-primary: 152 55% 42%;
+  --sidebar-primary-foreground: 0 0% 100%;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+}

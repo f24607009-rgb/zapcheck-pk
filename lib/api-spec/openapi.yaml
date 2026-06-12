@@ -1,0 +1,710 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: BillSmart PK - AI-powered electricity bill analyzer API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: bills
+    description: Bill management
+  - name: chat
+    description: AI chatbot
+  - name: tariffs
+    description: Tariff management
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ── Auth ──────────────────────────────────────────────────────────────────
+
+  /auth/signup:
+    post:
+      operationId: signup
+      tags: [auth]
+      summary: Create a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupInput"
+      responses:
+        "200":
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Email already in use or invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Bills ─────────────────────────────────────────────────────────────────
+
+  /bills/check:
+    post:
+      operationId: checkOvercharge
+      tags: [bills]
+      summary: Check if a bill is overcharged (manual entry)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OverchargeCheck"
+      responses:
+        "200":
+          description: Overcharge analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillAnalysis"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /bills:
+    post:
+      operationId: saveBill
+      tags: [bills]
+      summary: Save a bill record to history
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BillRecord"
+      responses:
+        "201":
+          description: Bill saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaveBillResult"
+    get:
+      operationId: listBills
+      tags: [bills]
+      summary: List all bills for the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of bills
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BillList"
+
+  /bills/{id}:
+    get:
+      operationId: getBill
+      tags: [bills]
+      summary: Get a single bill by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bill detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bill"
+        "404":
+          description: Bill not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [bills]
+      summary: Get usage statistics for the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStats"
+
+  # ── Chat ──────────────────────────────────────────────────────────────────
+
+  /chat:
+    post:
+      operationId: sendChat
+      tags: [chat]
+      summary: Ask the AI chatbot a question
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+        "503":
+          description: AI service unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /chat/history:
+    get:
+      operationId: getChatHistory
+      tags: [chat]
+      summary: Get chat conversation history for the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Chat history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatHistoryList"
+
+  # ── Tariffs ───────────────────────────────────────────────────────────────
+
+  /tariffs:
+    get:
+      operationId: getTariffs
+      tags: [tariffs]
+      summary: Get active NEPRA tariff slabs and charges
+      responses:
+        "200":
+          description: Tariff data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TariffData"
+
+  /tariffs/admin:
+    get:
+      operationId: getAdminTariffs
+      tags: [tariffs]
+      summary: Get all tariffs including inactive ones (admin)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Full tariff data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTariffData"
+
+  /tariffs/{id}/rate:
+    patch:
+      operationId: updateTariffRate
+      tags: [tariffs]
+      summary: Update a tariff slab rate (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TariffRateInput"
+      responses:
+        "200":
+          description: Tariff updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessage"
+        "400":
+          description: Invalid rate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /tariffs/charges/{name}:
+    patch:
+      operationId: updateFixedCharge
+      tags: [tariffs]
+      summary: Update a fixed charge value (admin)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FixedChargeInput"
+      responses:
+        "200":
+          description: Charge updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessage"
+        "400":
+          description: Invalid value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    SuccessMessage:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    # ── Auth ──────────────────────────────────────────────────────────────
+
+    SignupInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          minLength: 6
+        name:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+
+    User:
+      type: object
+      required: [id, email]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        name:
+          type: ["string", "null"]
+        createdAt:
+          type: ["string", "null"]
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    # ── Bills ─────────────────────────────────────────────────────────────
+
+    SlabBreakdown:
+      type: object
+      required: [label, units, rate, charge]
+      properties:
+        label:
+          type: string
+        units:
+          type: integer
+        rate:
+          type: number
+        charge:
+          type: number
+
+    OverchargeCheck:
+      type: object
+      required: [units, billedAmount]
+      properties:
+        units:
+          type: integer
+        billedAmount:
+          type: number
+
+    BillAnalysis:
+      type: object
+      required: [units, billedAmount, expectedAmount, isOvercharged, difference]
+      properties:
+        units:
+          type: integer
+        billedAmount:
+          type: number
+        expectedAmount:
+          type: number
+        isOvercharged:
+          type: boolean
+        difference:
+          type: number
+        message:
+          type: ["string", "null"]
+        warning:
+          type: ["string", "null"]
+        energyCharges:
+          type: ["number", "null"]
+        meterRent:
+          type: ["number", "null"]
+        fca:
+          type: ["number", "null"]
+        gst:
+          type: ["number", "null"]
+        slabBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/SlabBreakdown"
+
+    BillRecord:
+      type: object
+      required: [units, billedAmount, expectedAmount, isOvercharged, difference]
+      properties:
+        units:
+          type: integer
+        billedAmount:
+          type: number
+        expectedAmount:
+          type: number
+        isOvercharged:
+          type: boolean
+        difference:
+          type: number
+        energyCharges:
+          type: ["number", "null"]
+        meterRent:
+          type: ["number", "null"]
+        fca:
+          type: ["number", "null"]
+        gst:
+          type: ["number", "null"]
+        slabBreakdown:
+          type: ["array", "null"]
+          items:
+            $ref: "#/components/schemas/SlabBreakdown"
+        billMonth:
+          type: ["string", "null"]
+
+    SaveBillResult:
+      type: object
+      required: [id, message]
+      properties:
+        id:
+          type: integer
+        message:
+          type: string
+
+    Bill:
+      type: object
+      required: [id, units, billedAmount, expectedAmount, isOvercharged, difference, slabBreakdown, createdAt]
+      properties:
+        id:
+          type: integer
+        units:
+          type: integer
+        billedAmount:
+          type: number
+        expectedAmount:
+          type: number
+        isOvercharged:
+          type: boolean
+        difference:
+          type: number
+        energyCharges:
+          type: ["number", "null"]
+        meterRent:
+          type: ["number", "null"]
+        fca:
+          type: ["number", "null"]
+        gst:
+          type: ["number", "null"]
+        slabBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/SlabBreakdown"
+        billMonth:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+
+    BillList:
+      type: object
+      required: [bills]
+      properties:
+        bills:
+          type: array
+          items:
+            $ref: "#/components/schemas/Bill"
+
+    UserStats:
+      type: object
+      required: [totalBills, overchargedCount, totalOvercharge, avgUnits]
+      properties:
+        totalBills:
+          type: integer
+        overchargedCount:
+          type: integer
+        totalOvercharge:
+          type: number
+        avgUnits:
+          type: number
+
+    # ── Chat ──────────────────────────────────────────────────────────────
+
+    ChatRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        billContext:
+          type: ["object", "null"]
+          additionalProperties: true
+        billId:
+          type: ["integer", "null"]
+
+    ChatResponse:
+      type: object
+      required: [status, response]
+      properties:
+        status:
+          type: string
+        response:
+          type: string
+
+    ChatLog:
+      type: object
+      required: [id, userMessage, botResponse, status, createdAt]
+      properties:
+        id:
+          type: integer
+        userMessage:
+          type: string
+        botResponse:
+          type: string
+        status:
+          type: string
+        billId:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+
+    ChatHistoryList:
+      type: object
+      required: [logs]
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatLog"
+
+    # ── Tariffs ──────────────────────────────────────────────────────────
+
+    TariffSlab:
+      type: object
+      required: [label, min, max, rate]
+      properties:
+        label:
+          type: string
+        min:
+          type: integer
+        max:
+          type: integer
+        rate:
+          type: number
+
+    TariffData:
+      type: object
+      required: [slabs, charges]
+      properties:
+        slabs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffSlab"
+        charges:
+          type: object
+          additionalProperties:
+            type: number
+
+    AdminTariffSlab:
+      type: object
+      required: [id, slabLabel, minUnits, maxUnits, ratePerUnit, isActive]
+      properties:
+        id:
+          type: integer
+        slabLabel:
+          type: string
+        minUnits:
+          type: integer
+        maxUnits:
+          type: integer
+        ratePerUnit:
+          type: number
+        isActive:
+          type: boolean
+
+    AdminFixedCharge:
+      type: object
+      required: [id, chargeName, chargeValue, isActive]
+      properties:
+        id:
+          type: integer
+        chargeName:
+          type: string
+        chargeValue:
+          type: number
+        description:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+
+    AdminTariffData:
+      type: object
+      required: [slabs, charges]
+      properties:
+        slabs:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminTariffSlab"
+        charges:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminFixedCharge"
+
+    TariffRateInput:
+      type: object
+      required: [rate]
+      properties:
+        rate:
+          type: number
+
+    FixedChargeInput:
+      type: object
+      required: [value]
+      properties:
+        value:
+          type: number
