@@ -1,7 +1,9 @@
+[settings]
+rootDirectory = "artifacts/api-server"
+
 [build]
 builder = "nixpacks"
-buildCommand = "npm install -g pnpm && pnpm install --no-frozen-lockfile && node build.mjs"
+buildCommand = "pnpm install --no-frozen-lockfile && node build.mjs"
 
 [deploy]
 startCommand = "node --enable-source-maps ./dist/index.mjs"
-rootDirectory = "artifacts/api-server"
